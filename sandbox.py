@@ -9,18 +9,18 @@ def np_open(filename):
     return np.loadtxt(filename, delimiter='\n', dtype=str)
 
 
-def select_data(data, type='GGA'):
+def select_data(data, data_type='GGA'):
     """
     Select lines given a type of data to extract.
 
     :param data: raw nmea data
-    :param type: type of data to extract
+    :param data_type: type of data to extract
     :return:
     """
     L = [line.split(',') for line in data]
     res = []
     for line in L:
-        if line[0] == f"$GP{type}":
+        if line[0] == f"$GP{data_type}":
             res.append(line)
     return res
 
@@ -41,7 +41,6 @@ def plot_data(data):
 
 
 if __name__ == '__main__':
-    print(np_open('data/data_uv24.nmea'))
     data = np_open('data/data_uv24.nmea')
     print(select_data(data))
     plot_data(select_data(data))
