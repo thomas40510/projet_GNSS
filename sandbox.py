@@ -22,8 +22,8 @@ def plot_data(data):
     lat = []
     lon = []
     for line in data:
-        lat.append(float(line[2]))
-        lon.append(float(line[4]))
+        lat.append(float(line[4]) if line[5] == 'E' else -float(line[4]))
+        lon.append(float(line[2]) if line[3] == 'N' else -float(line[2]))
     plt.plot(lat, lon)
     plt.show()
 
