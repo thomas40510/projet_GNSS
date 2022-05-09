@@ -9,17 +9,18 @@ def np_open(filename):
     return np.loadtxt(filename, delimiter='\n', dtype=str)
 
 
-def select_data(data):
+def select_data(data, type='GGA'):
     """
-    Select interesting lines from nmea data.
+    Select lines given a type of data to extract.
 
-    :param data:
+    :param data: raw nmea data
+    :param type: type of data to extract
     :return:
     """
     L = [line.split(',') for line in data]
     res = []
     for line in L:
-        if line[0] == '$GPGGA':
+        if line[0] == f"$GP{type}":
             res.append(line)
     return res
 
