@@ -24,13 +24,17 @@ class Data:
                 vtg.append(line)
         return vtg
 
-    def plot_coords(self):
+    @property
+    def gps_coords(self):
         lat = []
         lon = []
         for line in self.gga:
             lat.append(float(line[4]) if line[5] == 'E' else -float(line[4]))
             lon.append(float(line[2]) if line[3] == 'N' else -float(line[6]))
-        plt.plot(lat, lon, '--.')
+        return (lat, lon)
+
+    def plot_coords(self):
+        plt.plot(self.gps_coords[0], self.gps_coords[1], '--.')
         plt.show()
 
 
