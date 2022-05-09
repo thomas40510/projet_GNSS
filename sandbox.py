@@ -10,6 +10,12 @@ def np_open(filename):
 
 
 def select_data(data):
+    """
+    Select interesting lines from nmea data.
+
+    :param data:
+    :return:
+    """
     L = [line.split(',') for line in data]
     res = []
     for line in L:
@@ -19,6 +25,11 @@ def select_data(data):
 
 
 def plot_data(data):
+    """
+    Plot data.
+
+    :param data:
+    """
     lat = []
     lon = []
     for line in data:
