@@ -1,3 +1,5 @@
+from math import floor
+
 import numpy as np
 import matplotlib.pyplot as plt
 import folium
@@ -26,7 +28,7 @@ def min_to_deg(minutes):
 def nmea_to_decimal(nmea):
     coord = float(nmea[0])
     dir = nmea[-1]
-    deg = coord / 100
+    deg = floor(coord / 100)
     min = coord - deg * 100
     mult = -1 if dir == 'S' or dir == 'W' else 1
     decimal = deg + min_to_deg(min)
@@ -66,11 +68,14 @@ class Data:
 
     @property
     def gps_coords_decimal(self):
+        # dlat = -.19
+        # dlon = .168
+        dlat = dlon = 0
         lat = []
         lon = []
         for line in self.gga:
-            lat.append(nmea_to_decimal(line[4:6]) - .19)
-            lon.append(nmea_to_decimal(line[2:4]) + .168)
+            lat.append(nmea_to_decimal(line[4:6]) + dlat)
+            lon.append(nmea_to_decimal(line[2:4]) + dlon)
         return lat, lon
 
     def plot_coords(self):
