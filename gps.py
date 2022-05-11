@@ -42,7 +42,7 @@ class Data:
     @property
     def gga(self):
         gga = []
-        L = [line.split(',') for line in self.raw]
+        L = [line.replace("'", "").split(',') for line in self.raw]
         for line in L:
             if line[0] == '$GPGGA':
                 gga.append(line)
@@ -94,7 +94,9 @@ class Data:
 
 
 if __name__ == '__main__':
-    d = Data('data/data_uv24.nmea')
+    # d = Data('data/data_uv24.nmea')
+    d = Data('data/gpsdata110522.txt')
     # d.plot_coords()
     print(d.gps_coords_decimal)
+    # print(d2.gps_coords_decimal)
     d.coords_on_map()
