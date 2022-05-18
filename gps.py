@@ -90,7 +90,7 @@ class Data:
         m = folium.Map(location=coords[0], zoom_start=15, control_scale=True)
         folium.Marker([48.41955333953407, -4.47470559068223], popup='ENSTA', tooltip='hey!').add_to(m)
         PolyLineOffset(coords).add_to(m)
-        m.save('gps_map.html')
+        m.save('out/gps_map.out')
 
 
 if __name__ == '__main__':
