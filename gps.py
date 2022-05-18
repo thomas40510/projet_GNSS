@@ -91,6 +91,22 @@ class Data:
         folium.Marker([48.41955333953407, -4.47470559068223], popup='ENSTA', tooltip='hey!').add_to(m)
         PolyLineOffset(coords).add_to(m)
         m.save('out/gps_map.out')
+        
+def satellite_pos(self):
+        """renvoie une matrice transmission avec pour chaque relevé gps une liste de
+        satellite contenant l'identité, l'élévation, l'azimut et la qualité du signal"""
+        transmission = []
+        nb_sat = 0
+        for line in self.gsv:
+            if line[2] == '1':
+                nb_sat = int(line[3])
+                transmission.append([])
+            n = min(nb_sat,4)
+            for i in range(0,n):
+                transmission[-1].append([int(line[(i+1)*4]),\
+                            int(line[(i+1)*4+1]), int(line[(i+1)*4 + 2]), int(line[(i+1)*4 +3])])
+                nb_sat -= 1
+        return transmission
 
 
 if __name__ == '__main__':
