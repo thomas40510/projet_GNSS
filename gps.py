@@ -58,6 +58,19 @@ class Data:
         return vtg
 
     @property
+    def gsv(self):
+        gsv = []
+        L = [line.split(',') for line in self.raw]
+        for line in L:
+            if line[0] == '$GPGSV':
+                last = line[-1].split('*')
+                gsv.append(line)
+                gsv[-1][-1] = last[0]
+                gsv[-1].append(last[1])
+
+        return gsv
+
+    @property
     def gps_coords(self):
         lat = []
         lon = []
@@ -92,11 +105,36 @@ class Data:
         PolyLineOffset(coords).add_to(m)
         m.save('gps_map.html')
 
+    def satellite_pos(self):
+        """renvoie une matrice transmission avec pour chaque relevé gps une liste de
+        satellite contenant l'identité, l'élévation, l'azimut et la qualité du signal"""
+        transmission = []
+        nb_sat = 0
+        for line in self.gsv:
+            if line[2] == '1':
+                nb_sat = int(line[3])
+                transmission.append([])
+            n = min(nb_sat,4)
+            for i in range(0,n):
+                transmission[-1].append([int(line[(i+1)*4]),\
+                            int(line[(i+1)*4+1]), int(line[(i+1)*4 + 2]), int(line[(i+1)*4 +3])])
+                nb_sat -= 1
+        return transmission
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
-    # d = Data('data/data_uv24.nmea')
-    d = Data('data/gpsdata110522.txt')
+    d = Data('data/data_uv24.nmea')
+    #d = Data('data/gpsdata110522.txt')
     # d.plot_coords()
-    print(d.gps_coords_decimal)
+    print(d.gsv)
+    print(d.satellite_pos())
+    #print(d.gps_coords_decimal)
     # print(d2.gps_coords_decimal)
     d.coords_on_map()
