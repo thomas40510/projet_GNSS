@@ -4,7 +4,7 @@ import time
 
 # Setup pyGPS with a baud rate of 4800
 gps = test.pyGPS(4800)
-file = f"gps_export_{time.time()}.txt"
+file = f"data/gps_export_{time.time()}.txt"
 
 while True:
     # gps.updateData()
