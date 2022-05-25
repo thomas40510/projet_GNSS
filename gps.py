@@ -6,6 +6,7 @@ import folium
 from folium.plugins import *
 import pyproj.crs
 import geopandas as gpd
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def sexagesimal_to_decimal(sexagesimal):
@@ -116,19 +117,35 @@ class Data:
             n = min(nb_sat, 4)
             for i in range(0, n):
                 pos = (i + 1) * 4
-                transmission.append([int(line[pos]), int(line[pos + 1]), int(line[pos + 2])])
+                transmission.append([int(line[pos]),
+                                     int(line[pos + 1]),
+                                     int(line[pos + 2])])
                 nb_sat -= 1
         return np.asarray(transmission)
+
+    def plot_satellites(self):
+        """ Affiche les satellites en coordonnées polaires """
+        plt.close('all')
+        satpos = self.satellite_pos()
+        elev = satpos[:, 0]
+        azim = satpos[:, 1]
+        plt.polar(elev, azim, '.')
+        plt.show()
+
+    # TODO: transformer les azimuts / élévation en carto 3D des satellites
 
 
 if __name__ == '__main__':
     d = Data('data/data_uv24.nmea')
     # d = Data('data/gpsdata110522.txt')
     # d.plot_coords()
-    print(d.gps_coords_decimal)
-    print(d.gsv)
     satpos = d.satellite_pos()
-    plt.polar(satpos[:, 1], satpos[:, 2], '.')
+    t, r = satpos[:, 1], satpos[:, 0]
+
+    plt.polar(t, r, '.')
+
+    # plt.polar(satpos[:, 1], satpos[:, 0], '.')
+    # fig.colorbar(c, ax=ax)
+
     plt.show()
-    # print(d2.gps_coords_decimal)
     # d.coords_on_map()
