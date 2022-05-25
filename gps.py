@@ -58,6 +58,15 @@ class Data:
         return vtg
 
     @property
+    def gsv(self):
+        gsv = []
+        L = [line.split(',') for line in self.raw]
+        for line in L:
+            if line[0] == '$GPGSV':
+                gsv.append(line)
+        return gsv
+
+    @property
     def gps_coords(self):
         lat = []
         lon = []
@@ -88,34 +97,38 @@ class Data:
         # coordy = [el/95.76 for el in self.gps_coords[0]]
         coords = list(zip(self.gps_coords_decimal[1], self.gps_coords_decimal[0]))
         m = folium.Map(location=coords[0], zoom_start=15, control_scale=True)
-        folium.Marker([48.41955333953407, -4.47470559068223], popup='ENSTA', tooltip='hey!').add_to(m)
+        folium.Marker([48.41955333953407, -4.47470559068223],
+                      popup='ENSTA', tooltip='ENSTA').add_to(m)
         PolyLineOffset(coords).add_to(m)
-        m.save('out/gps_map.out')
+        m.save('out/gps_map.html')
 
+    def satellite_pos(self):
+        """
+        extrait depuis les trames GSV les azimut et élévation des satellites en donnant la force du signal
 
-def satellite_pos(self):
-    """
-    renvoie une matrice transmission avec pour chaque relevé gps une liste de
-    satellite contenant l'identité, l'élévation, l'azimut et la qualité du signal
-    """
-    transmission = []
-    nb_sat = 0
-    for line in self.gsv:
-        if line[2] == '1':
-            nb_sat = int(line[3])
-            transmission.append([])
-        n = min(nb_sat, 4)
-        for i in range(0, n):
-            transmission[-1].append([int(line[(i + 1) * 4]), int(line[(i + 1) * 4 + 1]), int(line[(i + 1) * 4 + 2]),
-                                     int(line[(i + 1) * 4 + 3])])
-            nb_sat -= 1
-    return transmission
+        :return: matrice transmission
+        """
+        transmission = []
+        nb_sat = 0
+        for line in self.gsv:
+            if line[2] == '1':
+                nb_sat = int(line[3])
+            n = min(nb_sat, 4)
+            for i in range(0, n):
+                pos = (i + 1) * 4
+                transmission.append([int(line[pos]), int(line[pos + 1]), int(line[pos + 2])])
+                nb_sat -= 1
+        return np.asarray(transmission)
 
 
 if __name__ == '__main__':
-    # d = Data('data/data_uv24.nmea')
-    d = Data('data/gpsdata110522.txt')
+    d = Data('data/data_uv24.nmea')
+    # d = Data('data/gpsdata110522.txt')
     # d.plot_coords()
     print(d.gps_coords_decimal)
+    print(d.gsv)
+    satpos = d.satellite_pos()
+    plt.polar(satpos[:, 1], satpos[:, 2], '.')
+    plt.show()
     # print(d2.gps_coords_decimal)
-    d.coords_on_map()
+    # d.coords_on_map()
