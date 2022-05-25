@@ -42,6 +42,11 @@ class Data:
 
     @property
     def gga(self):
+        """
+        données de position
+
+        :return: la trame GGA brute
+        """
         gga = []
         L = [line.replace("'", "").split(',') for line in self.raw]
         for line in L:
@@ -51,6 +56,11 @@ class Data:
 
     @property
     def vtg(self):
+        """
+        données de vitesse
+
+        :return: la trame VTG brute
+        """
         vtg = []
         L = [line.split(',') for line in self.raw]
         for line in L:
@@ -60,6 +70,11 @@ class Data:
 
     @property
     def gsv(self):
+        """
+        données sur les satellites
+
+        :return: la trame GSV brute
+        """
         gsv = []
         L = [line.split(',') for line in self.raw]
         for line in L:
@@ -69,6 +84,11 @@ class Data:
 
     @property
     def gps_coords(self):
+        """
+        extraction des coordonnées GPS depuis les données GGA
+
+        :return: latitudes et longitudes sexagesimales
+        """
         lat = []
         lon = []
         for line in self.gga:
@@ -78,6 +98,11 @@ class Data:
 
     @property
     def gps_coords_decimal(self):
+        """
+        extraction des coordonnées GPS en format décimal
+
+        :return: latitudes et longitudes décimales
+        """
         # dlat = -.19
         # dlon = .168
         dlat = dlon = 0
@@ -89,13 +114,19 @@ class Data:
         return lat, lon
 
     def plot_coords(self):
+        """
+        affichage des coordonnées GPS sur un axe 2D
+        """
         plt.plot(self.gps_coords[0], self.gps_coords[1], '--.')
         plt.show()
 
     def coords_on_map(self):
+        """
+        affichage des données GPS sur une carte grâce à folium
+
+        :return: crée un fichier html
+        """
         locEnsta = [48.4183363, -4.4730597]
-        # coordx = [el/99.653 for el in self.gps_coords[1]]
-        # coordy = [el/95.76 for el in self.gps_coords[0]]
         coords = list(zip(self.gps_coords_decimal[1], self.gps_coords_decimal[0]))
         m = folium.Map(location=coords[0], zoom_start=15, control_scale=True)
         folium.Marker([48.41955333953407, -4.47470559068223],
