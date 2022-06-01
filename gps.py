@@ -1,12 +1,9 @@
 from math import floor
 
-import numpy as np
-import matplotlib.pyplot as plt
 import folium
+import matplotlib.pyplot as plt
+import numpy as np
 from folium.plugins import *
-import pyproj.crs
-import geopandas as gpd
-from mpl_toolkits.mplot3d import Axes3D
 
 
 def sexagesimal_to_decimal(sexagesimal):
@@ -39,6 +36,21 @@ def nmea_to_decimal(nmea):
 class Data:
     def __init__(self, filename):
         self.raw = np.loadtxt(fname=filename, delimiter='\n', dtype=str)
+        self.original_file = filename
+
+    def clean(self, save=False):
+        """
+        remove single quotes and newline
+        """
+        self.raw = np.char.replace(self.raw, "'", "")
+        self.raw = np.char.replace(self.raw, ", ", ",")
+        self.raw = np.char.replace(self.raw, "\\n", r"\n")
+        self.raw = np.char.replace(self.raw, "\\r", r"\r")
+        self.raw = np.char.replace(self.raw, "$", "\n$")
+        # save to new file
+        if save:
+            np.savetxt(self.original_file.replace(".txt", "_clean.txt"),
+                       self.raw, delimiter='', fmt='%s')
 
     @property
     def gga(self):
@@ -50,8 +62,13 @@ class Data:
         gga = []
         L = [line.replace("'", "").split(',') for line in self.raw]
         for line in L:
-            if line[0] == '$GPGGA':
-                gga.append(line)
+            try:
+                if line[0] == '$GPGGA' and len(line) == 9 and line[2] + line[4] != '':
+                    print(line)
+                    gga.append(line)
+            except IndexError as e:
+                print(e)
+                pass
         return gga
 
     @property
@@ -92,8 +109,13 @@ class Data:
         lat = []
         lon = []
         for line in self.gga:
-            lat.append(float(line[4]) if line[5] == 'E' else -float(line[4]))
-            lon.append(float(line[2]) if line[3] == 'N' else -float(line[6]))
+            try:
+                lat.append(float(line[4]) if line[5] == 'E' else -float(line[4]))
+                lon.append(float(line[2]) if line[3] == 'N' else -float(line[6]))
+            except Exception as e:
+                print(e)
+                print(line)
+                pass
         return lat, lon
 
     @property
@@ -109,6 +131,7 @@ class Data:
         lat = []
         lon = []
         for line in self.gga:
+            print(line)
             lat.append(nmea_to_decimal(line[4:6]) + dlat)
             lon.append(nmea_to_decimal(line[2:4]) + dlon)
         return lat, lon
@@ -117,7 +140,13 @@ class Data:
         """
         affichage des coordonnées GPS sur un axe 2D
         """
-        plt.plot(self.gps_coords[0], self.gps_coords[1], '--.')
+        try:
+            plt.plot(self.gps_coords[0], self.gps_coords[1], '--.')
+        except Exception as e:
+            n = min(len(self.gps_coords[0]), len(self.gps_coords[1]))
+            plt.plot(self.gps_coords[0][:n], self.gps_coords[1][:n], '--.')
+            print(e)
+            pass
         plt.show()
 
     def coords_on_map(self):
@@ -127,7 +156,8 @@ class Data:
         :return: crée un fichier html
         """
         locEnsta = [48.4183363, -4.4730597]
-        coords = list(zip(self.gps_coords_decimal[1], self.gps_coords_decimal[0]))
+        n = min(len(self.gps_coords[0]), len(self.gps_coords[1]))
+        coords = list(zip(self.gps_coords_decimal[1][:n], self.gps_coords_decimal[0][:n]))
         m = folium.Map(location=coords[0], zoom_start=15, control_scale=True)
         folium.Marker([48.41955333953407, -4.47470559068223],
                       popup='ENSTA', tooltip='ENSTA').add_to(m)
@@ -151,7 +181,7 @@ class Data:
                 transmission.append([int(line[pos]),
                                      int(line[pos + 1]),
                                      int(line[pos + 2])])
-                nb_sat -= 1
+            nb_sat -= 1
         return np.asarray(transmission)
 
     def plot_satellites(self):
@@ -167,16 +197,21 @@ class Data:
 
 
 if __name__ == '__main__':
-    d = Data('data/data_uv24.nmea')
+    # d = Data('data/data_uv24.nmea')
     # d = Data('data/gpsdata110522.txt')
+    filename = 'data/gps_export_1654070763.7245858_clean.txt'
+    d = Data(filename)
+    # d.clean()
     # d.plot_coords()
-    satpos = d.satellite_pos()
-    t, r = satpos[:, 1], satpos[:, 0]
-
-    plt.polar(t, r, '.')
+    # print(d.gsv)
+    # print(d.gga)
+    # satpos = d.satellite_pos()
+    # t, r = satpos[:, 1], satpos[:, 0]
+    #
+    # plt.polar(t, r, '.')
 
     # plt.polar(satpos[:, 1], satpos[:, 0], '.')
     # fig.colorbar(c, ax=ax)
 
-    plt.show()
-    # d.coords_on_map()
+    # plt.show()
+    d.coords_on_map()
