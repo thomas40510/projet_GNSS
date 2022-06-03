@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import folium
 from folium.plugins import *
+import re
 import pyproj.crs
 import geopandas as gpd
 
@@ -66,7 +67,7 @@ class Data:
         L = [line.replace("'", "").split(',') for line in self.raw]
         for line in L:
             try:
-                if line[0] == '$GPGGA' and len(line) == 9 and line[2] + line[4] != '':
+                if 'GGA' in line[0] and len(line) == 9 and line[2] != '' and line[4] != '':
                     print(line)
                     gga.append(line)
             except IndexError as e:
@@ -98,7 +99,7 @@ class Data:
         gsv = []
         L = [line.split(',') for line in self.raw]
         for line in L:
-            if line[0] == '$GPGSV':
+            if 'GSV' in line[0] and len(line) > 5:
                 gsv.append(line)
         return gsv
 
@@ -134,8 +135,15 @@ class Data:
         lat = []
         lon = []
         for line in self.gga:
-            lat.append(nmea_to_decimal(line[4:6]) + dlat)
-            lon.append(nmea_to_decimal(line[2:4]) + dlon)
+            try:
+                tmplat = nmea_to_decimal(line[4:6]) + dlat
+                tmplon = nmea_to_decimal(line[2:4]) + dlon
+            except Exception as e:
+                print(e)
+                print(line)
+                pass
+            lat.append(tmplat)
+            lon.append(tmplon)
         return lat, lon
 
     def plot_coords(self):
@@ -164,27 +172,34 @@ class Data:
         folium.Marker([48.41955333953407, -4.47470559068223],
                       popup='ENSTA', tooltip='ENSTA').add_to(m)
         PolyLineOffset(coords).add_to(m)
-        m.save('out/gps_map.out')
-        
-def satellite_pos(self):
+        m.save('out/gps_map.html')
+
+    def satellite_pos(self):
         """renvoie une matrice transmission avec pour chaque relevé gps une liste de
-        satellite contenant l'identité, l'élévation, l'azimut et la qualité du signal"""
+            satellite contenant l'identité, l'élévation, l'azimut et la qualité du signal"""
         transmission = []
         nb_sat = 0
         for line in self.gsv:
+            tmp = [re.sub('[a-zA-Z]*', '', re.sub('[*]\S*', '', el)) for el in line]
+            line = [el if el != '' else '0' for el in tmp]
             if line[2] == '1':
                 nb_sat = int(line[3])
                 transmission.append([])
-            n = min(nb_sat,4)
-            for i in range(0,n):
-                transmission[-1].append([int(line[(i+1)*4]),\
-                            int(line[(i+1)*4+1]), int(line[(i+1)*4 + 2]), int(line[(i+1)*4 +3])])
+            n = min(nb_sat, 4)
+            for i in range(0, n):
+                # print([line[(i + 1) * 4],
+                #        line[(i + 1) * 4 + 1], line[(i + 1) * 4 + 2],
+                #        line[(i + 1) * 4 + 3]])
+                try:
+                    el = [float(tmp[(i + 1) * 4]),
+                          float(tmp[(i + 1) * 4 + 1]), float(tmp[(i + 1) * 4 + 2])]
+                    transmission[-1].append(el)
+                except Exception as e:
+                    pass
                 nb_sat -= 1
         return transmission
 
-
-
-    def plot_satellite(self,i):
+    def plot_satellite(self, i):
         """
         Permet de représenter la position des satellites ayant enregistré la position numéro i de l'acquisition
         dans le système de coordonnées horizontales (référentiel terrestre en coordonnées sphériques)
@@ -196,9 +211,9 @@ def satellite_pos(self):
         L = []
         Ph = []
         for sat in satellite:
-            Ph.append(np.pi/2 - sat[1]*np.pi/180)
-            L.append(sat[2]*np.pi/180)
-        #lam, phi = np.meshgrid(L, Ph)
+            Ph.append(np.pi / 2 - sat[1] * np.pi / 180)
+            L.append(sat[2] * np.pi / 180)
+        # lam, phi = np.meshgrid(L, Ph)
         # coordonnees x,y,z de la sphere discretisee selon le maillage regulier lambda, phi
 
         fig = plt.figure()
@@ -207,15 +222,13 @@ def satellite_pos(self):
             x = a * np.cos(L[i]) * np.sin(Ph[i])
             y = a * np.sin(L[i]) * np.sin(Ph[i])
             z = a * np.cos(Ph[i])
-            ax.scatter(x,y,z,c='r', marker='^')
-        ax.scatter(0,0,0, c='b', s= 100, marker ='o')
+            ax.scatter(x, y, z, c='r', marker='^')
+        ax.scatter(0, 0, 0, c='b', s=100, marker='o')
         ax.set_xlabel('X Label')
         ax.set_ylabel('Y Label')
         ax.set_zlabel('Z Label')
 
         plt.show()
-
-
 
     def visu_planet(self):
         # load bluemarble with PIL
@@ -238,19 +251,19 @@ def satellite_pos(self):
 
         L, Ph = self.gps_coords_decimal
         print(Ph[0], L[0])
-        phi = np.pi/2 - Ph[0] * np.pi / 180
+        phi = np.pi / 2 - Ph[0] * np.pi / 180
         lam = L[0] * np.pi / 180
         print(lam, phi)
-        xc = 1.1*np.cos(lam) * np.sin(phi)
-        yc = 1.1*np.sin(lam) * np.sin(phi)
-        zc = 1.1*np.cos(phi)
-        print(xc,yc,zc)
+        xc = 1.1 * np.cos(lam) * np.sin(phi)
+        yc = 1.1 * np.sin(lam) * np.sin(phi)
+        zc = 1.1 * np.cos(phi)
+        print(xc, yc, zc)
         ax.scatter(xc, yc, zc, c='b', s=100, marker='*')
 
-        #satellite
+        # satellite
         satellite = self.satellite_pos()[0]
-        R = [[-np.sin(lam), -np.sin(phi)*np.cos(phi), np.cos(phi)*np.cos(lam)],
-             [np.cos(lam), -np.sin(phi)*np.sin(lam), np.cos(phi)*np.sin(lam)],
+        R = [[-np.sin(lam), -np.sin(phi) * np.cos(phi), np.cos(phi) * np.cos(lam)],
+             [np.cos(lam), -np.sin(phi) * np.sin(lam), np.cos(phi) * np.sin(lam)],
              [0, np.cos(phi), np.sin(phi)]]
         a = 3.14
         L_sat = []
@@ -261,14 +274,13 @@ def satellite_pos(self):
         # lam, phi = np.meshgrid(L, Ph)
         # coordonnees x,y,z de la sphere discretisee selon le maillage regulier lambda, phi
 
-
         for i in range(len(L_sat)):
             x = a * np.cos(L_sat[i]) * np.sin(Ph_sat[i])
             y = a * np.sin(L_sat[i]) * np.sin(Ph_sat[i])
             z = a * np.cos(Ph_sat[i])
 
-            X = np.array(R).dot(np.array([x,y,z]).T)
-            x,y,z = X.T
+            X = np.array(R).dot(np.array([x, y, z]).T)
+            x, y, z = X.T
             if i == 1:
                 print(X.T)
             ax.scatter(x, y, z, c='r', marker='^')
@@ -276,11 +288,11 @@ def satellite_pos(self):
         plt.show()
 
 
-
 if __name__ == '__main__':
     # d = Data('data/data_uv24.nmea')
     # d = Data('data/gpsdata110522.txt')
     filename = 'data/gps_export_1654070763.7245858_clean.txt'
+    # filename = 'data/data_uv24.nmea'
     d = Data(filename)
     # d.clean()
     # d.plot_coords()
