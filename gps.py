@@ -48,9 +48,9 @@ class Data:
         """
         self.raw = np.char.replace(self.raw, "'", "")
         self.raw = np.char.replace(self.raw, ", ", ",")
-        self.raw = np.char.replace(self.raw, "\\n", r"\n")
-        self.raw = np.char.replace(self.raw, "\\r", r"\r")
-        self.raw = np.char.replace(self.raw, "$", "\n$")
+        # self.raw = np.char.replace(self.raw, "\\n", r"\n")
+        # self.raw = np.char.replace(self.raw, "\\r", r"\r")
+        # self.raw = np.char.replace(self.raw, "$", "\n$")
         # save to new file
         if save:
             np.savetxt(self.original_file.replace(".txt", "_clean.txt"),
@@ -67,11 +67,9 @@ class Data:
         L = [line.replace("'", "").split(',') for line in self.raw]
         for line in L:
             try:
-                if 'GGA' in line[0] and len(line) == 9 and line[2] != '' and line[4] != '':
-                    print(line)
+                if 'GGA' in line[0] and len(line) > 10 and line[2] != '' and line[4] != '':
                     gga.append(line)
             except IndexError as e:
-                print(e)
                 pass
         return gga
 
@@ -117,8 +115,6 @@ class Data:
                 lat.append(float(line[4]) if line[5] == 'E' else -float(line[4]))
                 lon.append(float(line[2]) if line[3] == 'N' else -float(line[6]))
             except Exception as e:
-                print(e)
-                print(line)
                 pass
         return lat, lon
 
@@ -134,17 +130,28 @@ class Data:
         dlat = dlon = 0
         lat = []
         lon = []
+        i = 0
         for line in self.gga:
             try:
                 tmplat = nmea_to_decimal(line[4:6]) + dlat
                 tmplon = nmea_to_decimal(line[2:4]) + dlon
+
+                if i != 0 and abs(tmplat - lat[-1]) < 1 and abs(tmplon - lon[-1]) < 1:
+                    lat.append(tmplat)
+                    lon.append(tmplon)
+                    print(tmplat, tmplon)
+                elif i == 0:
+                    lat.append(tmplat)
+                    lon.append(tmplon)
+                    i += 1
+
             except Exception as e:
-                print(e)
-                print(line)
+                # print(line)
                 pass
-            lat.append(tmplat)
-            lon.append(tmplon)
         return lat, lon
+
+    def __str__(self):
+        return str(self.raw)
 
     def plot_coords(self):
         """
@@ -291,11 +298,13 @@ class Data:
 if __name__ == '__main__':
     # d = Data('data/data_uv24.nmea')
     # d = Data('data/gpsdata110522.txt')
-    filename = 'data/gps_export_1654070763.7245858_clean.txt'
+    # filename = 'data/gps_export_1654070763.7245858_clean.txt'
+    filename = 'data/foyz.txt'
     # filename = 'data/data_uv24.nmea'
     d = Data(filename)
-    # d.clean()
-    # d.plot_coords()
+    d.clean()
+    # print(d.gga)
+    d.plot_coords()
     # print(d.gsv)
     # print(d.gga)
     # satpos = d.satellite_pos()
