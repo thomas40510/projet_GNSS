@@ -28,8 +28,9 @@ def min_to_deg(minutes):
 
 
 def dist_ang(coordA, coordB):
-    return np.arccos(np.sin(coordA[1]*np.pi/180) * np.sin(coordB[1]*np.pi/180) + \
-                     np.cos(coordA[1]*np.pi/180) * np.cos(coordB[1]*np.pi/180) * np.cos((coordA[0] - coordB[0])*np.pi/180)) * 6378137
+    return np.arccos(np.sin(coordA[1] * np.pi / 180) * np.sin(coordB[1] * np.pi / 180) +
+                     np.cos(coordA[1] * np.pi / 180) * np.cos(coordB[1] * np.pi / 180) *
+                     np.cos((coordA[0] - coordB[0]) * np.pi / 180)) * 6378137
 
 
 def nmea_to_decimal(nmea):
@@ -339,11 +340,13 @@ if __name__ == '__main__':
 
     # plt.show()
     d.coords_on_map()
-    print("distance de précis à pas précis :",dist_ang(d.stats[0], d2.stats[0]))
-    print("incertitude pas précis :",dist_ang(list(np.array(d.stats[0])+np.array(d.stats[1])), list(np.array(d.stats[0]) - np.array(d.stats[1]))))
-    print("incertitude précis :",dist_ang(list(np.array(d2.stats[0])+np.array(d2.stats[1])), list(np.array(d2.stats[0]) - np.array(d2.stats[1]))))
+    print("distance de précis à pas précis :", dist_ang(d.stats[0], d2.stats[0]))
+    print("incertitude pas précis :", dist_ang(list(np.array(d.stats[0]) + np.array(d.stats[1])),
+                                               list(np.array(d.stats[0]) - np.array(d.stats[1]))))
+    print("incertitude précis :", dist_ang(list(np.array(d2.stats[0]) + np.array(d2.stats[1])),
+                                           list(np.array(d2.stats[0]) - np.array(d2.stats[1]))))
     ref = [-4.47424307, 48.41903413]
-    print("distance réf à pas précis :", dist_ang(d.stats[0],ref))
-    print("distance réf à précis :", dist_ang(d2.stats[0],ref))
+    print("distance réf à pas précis :", dist_ang(d.stats[0], ref))
+    print("distance réf à précis :", dist_ang(d2.stats[0], ref))
 
     # d.visu_planet()
