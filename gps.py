@@ -139,7 +139,6 @@ class Data:
                 if i != 0 and abs(tmplat - lat[-1]) < 1 and abs(tmplon - lon[-1]) < 1:
                     lat.append(tmplat)
                     lon.append(tmplon)
-                    print(tmplat, tmplon)
                 elif i == 0:
                     lat.append(tmplat)
                     lon.append(tmplon)
@@ -149,6 +148,13 @@ class Data:
                 # print(line)
                 pass
         return lat, lon
+
+    @property
+    def stats(self):
+        temp = np.asarray(self.gps_coords_decimal)
+        mean = (np.mean(temp[0]), np.mean(temp[1]))
+        std = (np.std(temp[0]), np.std(temp[1]))
+        return mean, std
 
     def __str__(self):
         return str(self.raw)
@@ -212,7 +218,6 @@ class Data:
         dans le système de coordonnées horizontales (référentiel terrestre en coordonnées sphériques)
         """
         satellite = self.satellite_pos()[i]
-        print(satellite)
         a = 20
 
         L = []
@@ -294,17 +299,29 @@ class Data:
 
         plt.show()
 
+    def compare(self, other):
+        """ Permet de comparer graphiquement les données gps de deux acquisitions"""
+        plt.plot(self.gps_coords_decimal[0], self.gps_coords_decimal[1], '.b')
+        plt.plot(other.gps_coords_decimal[0], other.gps_coords_decimal[1], '.r')
+        plt.legend(['acquisition 1', 'acquisition 2'])
+        plt.show()
+
 
 if __name__ == '__main__':
     # d = Data('data/data_uv24.nmea')
     # d = Data('data/gpsdata110522.txt')
     # filename = 'data/gps_export_1654070763.7245858_clean.txt'
-    filename = 'data/foyz.txt'
+    filename = 'data/not_precise_rugby.txt'
     # filename = 'data/data_uv24.nmea'
     d = Data(filename)
     d.clean()
     # print(d.gga)
-    d.plot_coords()
+    # d.plot_coords()
+    print(d.stats)
+    d2 = Data('data/precise_rugby.txt')
+    d2.clean()
+    print(d2.stats)
+    d.compare(d2)
     # print(d.gsv)
     # print(d.gga)
     # satpos = d.satellite_pos()
@@ -318,4 +335,4 @@ if __name__ == '__main__':
     # plt.show()
     d.coords_on_map()
 
-    d.visu_planet()
+    # d.visu_planet()
