@@ -1,0 +1,106 @@
+% chercher des documents LaTeX dans styles, corps et bib
+\makeatletter\def\input@path{{styles/}{corps/}{bib/}}\makeatother
+
+% Utiliser le style rapport.cls
+\documentclass[12pt, a4paper]{report}
+
+\usepackage[a4paper,vdivide={*,23cm,4cm}]{geometry}
+\usepackage[russian, french]{babel} % style francais
+\usepackage[encapsulated]{CJK}
+\usepackage{styles/pageGardeEnsta}
+\usepackage[T2A, T1]{fontenc}
+\usepackage[utf8]{inputenc} % pour taper les accents directement
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\usepackage{tabularx}
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{titlesec}
+%\titleformat*{\section}{\fontfamily{lmss}\selectfont\Large\bfseries}
+\renewcommand{\thesection}{\Roman{section}.}
+\titlespacing*{\section}{0pt}{\baselineskip}{.5\baselineskip}
+
+\titleformat*{\subsection}{\fontfamily{lmss}\selectfont\large\bfseries}
+\titlespacing*{\subsection}{1em}{.7\baselineskip}{.5\baselineskip}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}.}
+\renewcommand{\thesubsubsection}{\thesubsection\arabic{subsubsection}}
+\titlespacing*{\subsubsection}{0pt}{.5\baselineskip}{.3\baselineskip}
+
+\renewcommand{\labelenumi}{\textbf{\arabic{enumi}.}}
+
+
+%\usepackage{fourier}
+
+\usepackage[hidelinks]{hyperref}
+
+% chemistry
+\usepackage[version=3]{mhchem}
+
+\graphicspath{{imgs/}}
+% liens hypertexte dans le document
+\usepackage{xcolor}
+\usepackage{textcomp}
+
+\usepackage{lastpage}
+
+\usepackage{pgf-umlcd}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{}
+\fancyhead[C]{}
+\fancyhead[R]{Projet découverte de système}
+\fancyfoot[L]{}
+\fancyfoot[C]{}
+\fancyfoot[R]{Page \thepage{} sur~\pageref{LastPage}}
+
+\usepackage{lscape}
+\usepackage{booktabs}
+
+
+\title{Positionnement GNSS : du mètre au millimètre}
+\author{}
+\date{\today}
+\doctype{Projet découverte de système}
+\promo{FISE 2024}
+\etablissement{\textsc{Ensta} Bretagne\\ 2, rue François Verny\\
+   29806 \textsc{Brest} cedex\\ \textsc{France}}
+\logoEcole{\includegraphics[height=4.2cm]{logo_ENSTA_Bretagne_Vertical_CMJN}}
+
+
+\newcommand{\ie}{\textit{i.e.}}
+
+\begin{document}
+
+\maketitle
+
+   \tableofcontents
+
+   \include{corps/front}
+
+   \include{corps/main}
+
+%   \include{corps/annexe1}
+%
+%   \include{corps/annexe2}
+
+
+   % \include{corps/back}
+
+   \bibliographystyle{plain}
+   % \bibliographystyle{ieeetr}
+   \bibliography{bib/biblio}
+   \addcontentsline{toc}{section}{Références}
+
+% \listoffigures
+% \addcontentsline{toc}{section}{Liste des figures}
+
+
+
+\end{document}
