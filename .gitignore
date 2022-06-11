@@ -48,7 +48,7 @@ cmake-build-*/
 *.iws
 
 # IntelliJ
-out/
+# out/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -116,7 +116,7 @@ fabric.properties
 
 ## Build tool directories for auxiliary files
 # latexrun
-# latex.out/
+latex.out/
 
 ## Auxiliary and intermediate files from other packages:
 # algorithms
