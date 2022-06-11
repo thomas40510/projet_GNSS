@@ -72,19 +72,39 @@
 
          En effet, le récepteur mesurant une distance $d$ le séparant d'un satellite se situe quelque part sur une boule de rayon $d$ autour de ce satellite.
 
-         [img1]
+         \begin{figure}[h]
+             \centering
+             \includegraphics[width=.3\textwidth]{imgs/sat1}
+             \caption{Un premier satellite}
+             \label{fig:1sat}
+         \end{figure}
 
          En se munissant d'un second satellite, de distance connue, on peut de la même manière tracer autour de sa position une boule de rayon égal à cette distance.
 
-         [img2]
+         \begin{figure}[h]
+             \centering
+             \includegraphics[width=.3\textwidth]{imgs/sat2}
+             \caption{Deux satellites}
+             \label{fig:2sat}
+         \end{figure}
 
          Et finalement, la même opération sur un troisième satellite permettra au récepteur d'identifier l'unique point d'intersection entre les boules, correspondant à sa position.
 
-         [img3]
+         \begin{figure}[h]
+             \centering
+             \includegraphics[width=.3\textwidth]{imgs/sat3}
+             \caption{3 satellites, détermination de position}
+             \label{fig:3sat}
+         \end{figure}
 
          Il est alors très logiquement possible d'affiner ce résultat en augmentant le nombre de satellites, ou encore la précision de la mesure du temps du récepteur par exemple.
 
-         [img4]
+         \begin{figure}[h]
+             \centering
+             \includegraphics[width=.5\textwidth]{imgs/sat-3D}
+             \caption{Représentation en 3D}
+             \label{fig:repr3d}
+         \end{figure}
 
       \subsubsection{Synchronicité des horloges}
          La détermination de la distance entre le récepteur et les satellites étant intrinsèquement liée à un repère d'horloge, une synchronisation temporelle entre les satellites et le récepteur est nécessaire (une erreur de l'ordre du millionième de seconde entraîne une erreur de positionnement de l'ordre de la centaine de mètres !).
@@ -107,4 +127,9 @@
 
          On donne l'exemple d'une trame GGA reçue par le système GPS, et on remarquera en particulier le \textit{checksum}, clé de contrôle permettant de vérifier la validité des données :
 
-         [trame GGA]
+         \begin{figure}[h]
+             \centering
+             \includegraphics[width=.95\textwidth]{imgs/trame-gga}
+             \caption{Exemple de trame GGA}
+             \label{fig:trame-gga}
+         \end{figure}
