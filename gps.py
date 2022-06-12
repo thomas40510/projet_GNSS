@@ -8,6 +8,8 @@ from folium.plugins import *
 import re
 import pyproj.crs
 import geopandas as gpd
+import operator
+from functools import reduce
 
 
 def sexagesimal_to_decimal(sexagesimal):
@@ -116,13 +118,15 @@ class Data:
         """
         lat = []
         lon = []
+        alt = []
         for line in self.gga:
             try:
                 lat.append(float(line[4]) if line[5] == 'E' else -float(line[4]))
                 lon.append(float(line[2]) if line[3] == 'N' else -float(line[6]))
+                alt.append(float(line[9]))
             except Exception as e:
                 pass
-        return lat, lon
+        return [lat, lon, alt]
 
     @property
     def gps_coords_decimal(self):
@@ -136,6 +140,7 @@ class Data:
         dlat = dlon = 0
         lat = []
         lon = []
+        alts = []
         i = 0
         for line in self.gga:
             try:
@@ -149,11 +154,12 @@ class Data:
                     lat.append(tmplat)
                     lon.append(tmplon)
                     i += 1
+                alts.append(float(line[9]))
 
             except Exception as e:
                 # print(line)
                 pass
-        return lat, lon
+        return lat, lon, alts
 
     @property
     def stats(self):
@@ -176,6 +182,14 @@ class Data:
             plt.plot(self.gps_coords[0][:n], self.gps_coords[1][:n], '--.')
             print(e)
             pass
+        plt.show()
+
+    def plot_coords_3d(self):
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+        ax.plot(self.gps_coords[0],
+                self.gps_coords[1],
+                self.gps_coords[2], '--.')
         plt.show()
 
     def coords_on_map(self):
@@ -339,7 +353,7 @@ if __name__ == '__main__':
     # fig.colorbar(c, ax=ax)
 
     # plt.show()
-    d.coords_on_map()
+    # d.coords_on_map()
     print("distance de précis à pas précis :", dist_ang(d.stats[0], d2.stats[0]))
     print("incertitude pas précis :", dist_ang(list(np.array(d.stats[0]) + np.array(d.stats[1])),
                                                list(np.array(d.stats[0]) - np.array(d.stats[1]))))
