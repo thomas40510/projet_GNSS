@@ -116,17 +116,17 @@ class Data:
 
         :return: latitudes et longitudes sexagesimales
         """
+        long = []
         lat = []
-        lon = []
         alt = []
         for line in self.gga:
             try:
-                lat.append(float(line[4]) if line[5] == 'E' else -float(line[4]))
-                lon.append(float(line[2]) if line[3] == 'N' else -float(line[6]))
+                long.append(float(line[4]) if line[5] == 'E' else -float(line[4]))
+                lat.append(float(line[2]) if line[3] == 'N' else -float(line[6]))
                 alt.append(float(line[9]))
             except Exception as e:
                 pass
-        return [lat, lon, alt]
+        return [long, lat, alt]
 
     @property
     def gps_coords_decimal(self):
@@ -135,31 +135,31 @@ class Data:
 
         :return: latitudes et longitudes décimales
         """
-        # dlat = -.19
-        # dlon = .168
-        dlat = dlon = 0
+        # dlong = -.19
+        # dlat = .168
+        dlong = dlat = 0
+        long = []
         lat = []
-        lon = []
         alts = []
         i = 0
         for line in self.gga:
             try:
-                tmplat = nmea_to_decimal(line[4:6]) + dlat
-                tmplon = nmea_to_decimal(line[2:4]) + dlon
+                tmplong = nmea_to_decimal(line[4:6]) + dlong
+                tmplat = nmea_to_decimal(line[2:4]) + dlat
 
-                if i != 0 and abs(tmplat - lat[-1]) < 1 and abs(tmplon - lon[-1]) < 1:
+                if i != 0 and abs(tmplong - long[-1]) < 1 and abs(tmplat - lat[-1]) < 1:
+                    long.append(tmplong)
                     lat.append(tmplat)
-                    lon.append(tmplon)
                 elif i == 0:
+                    long.append(tmplong)
                     lat.append(tmplat)
-                    lon.append(tmplon)
                     i += 1
                 alts.append(float(line[9]))
 
             except Exception as e:
                 # print(line)
                 pass
-        return lat, lon, alts
+        return long, lat, alts
 
     @property
     def stats(self):
@@ -182,6 +182,9 @@ class Data:
             plt.plot(self.gps_coords[0][:n], self.gps_coords[1][:n], '--.')
             print(e)
             pass
+        plt.xlabel('longitude')
+        plt.ylabel('latitude')
+        plt.title('Tracé GPS du récepteur')
         plt.show()
 
     def plot_coords_3d(self):
@@ -190,6 +193,10 @@ class Data:
         ax.plot(self.gps_coords[0],
                 self.gps_coords[1],
                 self.gps_coords[2], '--.')
+        ax.set_xlabel('longitude')
+        ax.set_ylabel('latitude')
+        ax.set_zlabel('altitude')
+        plt.title('Positions du récepteur GNSS')
         plt.show()
 
     def coords_on_map(self):
