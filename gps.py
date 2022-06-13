@@ -289,7 +289,7 @@ class Data:
         z = np.outer(np.ones(np.size(lons)), np.sin(lats)).T
         ax.plot_surface(x, y, z, rstride=4, cstride=4, facecolors=bm)
 
-        L, Ph = self.gps_coords_decimal
+        L, Ph = self.gps_coords_decimal[:2]
         print(Ph[0], L[0])
         phi = np.pi / 2 - Ph[0] * np.pi / 180
         lam = L[0] * np.pi / 180
@@ -352,23 +352,24 @@ if __name__ == '__main__':
     d.compare(d2)
     # print(d.gsv)
     # print(d.gga)
-    # satpos = d.satellite_pos()
-    # t, r = satpos[:, 1], satpos[:, 0]
-    #
-    # plt.polar(t, r, '.')
+    d3 = Data("data/data_uv24.nmea")
+    satpos = d3.satellite_pos()
+    t, r = satpos[:][1], satpos[:][0]
 
+    plt.polar(t, r, '.')
+    plt.show()
     # plt.polar(satpos[:, 1], satpos[:, 0], '.')
     # fig.colorbar(c, ax=ax)
 
     # plt.show()
-    d.coords_on_map()
-    print("distance de précis à pas précis :", dist_ang(d.stats[0], d2.stats[0]))
-    print("incertitude pas précis :", dist_ang(list(np.array(d.stats[0]) + np.array(d.stats[1])),
-                                               list(np.array(d.stats[0]) - np.array(d.stats[1]))))
-    print("incertitude précis :", dist_ang(list(np.array(d2.stats[0]) + np.array(d2.stats[1])),
-                                           list(np.array(d2.stats[0]) - np.array(d2.stats[1]))))
-    ref = [-4.47424307, 48.41903413]
-    print("distance réf à pas précis :", dist_ang(d.stats[0], ref))
-    print("distance réf à précis :", dist_ang(d2.stats[0], ref))
+    # d.coords_on_map()
+    # print("distance de précis à pas précis :", dist_ang(d.stats[0], d2.stats[0]))
+    # print("incertitude pas précis :", dist_ang(list(np.array(d.stats[0]) + np.array(d.stats[1])),
+    #                                            list(np.array(d.stats[0]) - np.array(d.stats[1]))))
+    # print("incertitude précis :", dist_ang(list(np.array(d2.stats[0]) + np.array(d2.stats[1])),
+    #                                        list(np.array(d2.stats[0]) - np.array(d2.stats[1]))))
+    # ref = [-4.47424307, 48.41903413]
+    # print("distance réf à pas précis :", dist_ang(d.stats[0], ref))
+    # print("distance réf à précis :", dist_ang(d2.stats[0], ref))
 
-    # d.visu_planet()
+    d.visu_planet()
