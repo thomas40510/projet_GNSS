@@ -497,3 +497,17 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+.DS_Store
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/markdown.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/other.xml
+.idea/py.iml
+.idea/vcs.xml
+rapport/.DS_Store
+rapport/bib/.DS_Store
+rapport/corps/.DS_Store
+rapport/imgs/.DS_Store
+rapport/out/.DS_Store
