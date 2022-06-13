@@ -205,11 +205,12 @@ class Data:
 
         :return: crée un fichier html
         """
-        locEnsta = [48.4183363, -4.4730597]
+        # locEnsta = [48.4183363, -4.4730597]
+        locEnsta = [48.41903413, -4.47424307]
         n = min(len(self.gps_coords[0]), len(self.gps_coords[1]))
         coords = list(zip(self.gps_coords_decimal[1][:n], self.gps_coords_decimal[0][:n]))
         m = folium.Map(location=coords[0], zoom_start=15, control_scale=True)
-        folium.Marker([48.41955333953407, -4.47470559068223],
+        folium.Marker(locEnsta,
                       popup='ENSTA', tooltip='ENSTA').add_to(m)
         PolyLineOffset(coords).add_to(m)
         m.save('out/gps_map.html')
@@ -360,7 +361,7 @@ if __name__ == '__main__':
     # fig.colorbar(c, ax=ax)
 
     # plt.show()
-    # d.coords_on_map()
+    d.coords_on_map()
     print("distance de précis à pas précis :", dist_ang(d.stats[0], d2.stats[0]))
     print("incertitude pas précis :", dist_ang(list(np.array(d.stats[0]) + np.array(d.stats[1])),
                                                list(np.array(d.stats[0]) - np.array(d.stats[1]))))
